@@ -34,10 +34,14 @@ XBee xbee = new XBee();
 
 int error=0;
 
+int ballX = 0;
+
 // make an array list of thermometer objects for display
 ArrayList thermometers = new ArrayList();
 // create a font for display
 PFont font;
+
+SimpleThread testThread;
 
 void setup() {
   size(800, 600); // screen size
@@ -49,6 +53,8 @@ void setup() {
   // Print a list in case the selected one doesn't work out
   println("Available serial ports:");
   println(Serial.list());
+  
+  /*
   try {
     // opens your serial port defined above, at 9600 baud
     xbee.open(mySerialPort, 9600);
@@ -59,12 +65,28 @@ void setup() {
     println("Did you set your COM port in the code near line 20?");
     error=1;
   }
+  */
+  
+  //Create Thread
+  testThread = new SimpleThread(100,"a");
+  testThread.start();
+  
+  smooth();
 }
 
 
 // draw loop executes continuously
 void draw() {
     
+  fill(#000000);  
+  rect(0,0,width,height);
+  
+  fill(#c9c9c9);
+  ellipse(ballX,height/2,50,50);
+  
+  ballX += 2;
+  if (ballX > width) { ballX = 0;}
+  
   if (error == 1) {
     fill(0);
     text("** Error opening XBee port: **\n"+
@@ -72,7 +94,11 @@ void draw() {
       "Did you set your COM port in the code near line 20?", width/3, height/2);
   }
   
+  int a = testThread.getCount();
+  text(a,10,50);
+  
   //Get sensor data
+  /*  
   SensorData data = new SensorData(); // create a data object
   data = getData(); // put data into the data object
   
@@ -80,7 +106,8 @@ void draw() {
   if (data.value >=0 && data.address != null) { 
     println ("Address: " + data.address + " : " + data.value);
   }
-
+  */
+  
 } // end of draw loop
 
 
@@ -98,7 +125,8 @@ SensorData getData() {
   int value = -1;      // returns an impossible value if there's an error
   String address = ""; // returns a null value if there's an error
 
-  try {			
+  try {
+ 
     // we wait here until a packet is received.
     XBeeResponse response = xbee.getResponse();
     // uncomment next line for additional debugging information
@@ -141,5 +169,100 @@ SensorData getData() {
     println("Error receiving response: " + e);
   }
   return data; // sends the data back to the calling function
+}
+
+
+class SimpleThread extends Thread {
+ 
+  boolean running;           // Is the thread running?  Yes or no?
+  int wait;                  // How many milliseconds should we wait in between executions?
+  String id;                 // Thread name
+  int count;                 // counter
+
+
+  // Constructor, create the thread
+  // It is not running by default
+  SimpleThread (int w, String s) {
+    wait = w;
+    running = false;
+    id = s;
+    count = 0;
+  }
+ 
+  int getCount() {
+    return count;
+  }
+ 
+  // Overriding "start()"
+  void start () {
+
+    
+      try {
+    // opens your serial port defined above, at 9600 baud
+    xbee.open(mySerialPort, 9600);
+  }
+  catch (XBeeException e) {
+    println("** Error opening XBee port: " + e + " **");
+    println("Is your XBee plugged in to your computer?");
+    println("Did you set your COM port in the code near line 20?");
+    error=1;
+  }
+  
+    // Set running equal to true
+    running = true;
+    // Print messages
+    println("Starting thread (will execute every " + wait + " milliseconds.)");
+
+    // Do whatever start does in Thread, don't forget this!
+    super.start();
+    
+    println("START");
+
+
+  }
+ 
+ 
+  // We must implement run, this gets triggered by start()
+  void run () {
+    
+  println("RUNNING");
+  
+
+ 
+  
+    while (running) {
+      println(id + ": " + count);
+      count++;
+      // Ok, let's wait for however long we should wait
+      
+        SensorData data = new SensorData(); // create a data object
+  data = getData(); // put data into the data object
+  
+  println(">" + data.value);
+  
+  // check that actual data came in:
+  if (data.value >=0 && data.address != null) { 
+    println ("Address: " + data.address + " : " + data.value);
+  }
+  
+      try {
+        sleep((long)(wait));
+      } catch (Exception e) {
+      }
+    }
+  
+
+    //System.out.println(id + " thread is done!");  // The thread is done when we get to the end of run()
+    
+  }
+ 
+ 
+  // Our method that quits the thread
+  void quit() {
+    System.out.println("Quitting."); 
+    running = false;  // Setting running to false ends the loop in run()
+    // IUn case the thread is waiting. . .
+    interrupt();
+  }
 }
 
