@@ -12,8 +12,12 @@ int smooth_index = 0;                          // the index of the current readi
 int smooth_total = 0;                        // the running total
 int smooth_average = 0;
 
+boolean DEBUG = true;
 boolean XBEE = true;
 int whichMachine = 1;
+int USB_PORT = 4;
+static int TOTAL_WIDTH = 1280;
+
 String machineRoot = "";
 
 // 0 is Rui
@@ -48,8 +52,6 @@ boolean ballTouchingP2 = false;
 
 
 int minX,maxX,minY,maxY;
-
-
 
  
 boolean wPressed = false;
@@ -114,7 +116,7 @@ static public void main(String args[]) {
   PApplet applet = new xbeeControls_simpleJava();
   frame.add(applet);
   applet.init();
-  frame.setBounds(0, 0, 1280*2, 720); 
+  frame.setBounds(0, 0, TOTAL_WIDTH, 720); 
   frame.setVisible(true);
 }
 
@@ -123,9 +125,14 @@ void setup() {
   background(0);
   
   if (XBEE == true) {
-    mySerialPort = Serial.list()[4];
+    mySerialPort = Serial.list()[USB_PORT];
   }
 
+  for (int thisReading = 0; thisReading < smooth_numReadings; thisReading++)
+  {
+    smooth_readings[thisReading] = 0; 
+  }
+  
   switch(whichMachine){
   case 0:      // Rui
     machineRoot  = "/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/";
@@ -140,7 +147,7 @@ void setup() {
   
   font = loadFont(machineRoot + "data/CasaleTwo-Alternates-NBP-100.vlw");
   
-  size(1280*2, 720);
+  size(TOTAL_WIDTH, 720);
   minX = 0;
   maxX = width;
   minY = 0;
@@ -173,10 +180,29 @@ void setup() {
   //smooth();
   
   frameRate(60);
+  noCursor();
 
 
 }
 
+int smooth_left(int _val)
+{
+  smooth_total= smooth_total - smooth_readings[smooth_index];         
+  // read from the sensor:  
+  smooth_readings[smooth_index] = _val; 
+  // add the reading to the total:
+  smooth_total= smooth_total + smooth_readings[smooth_index];       
+  // advance to the next position in the array:  
+  smooth_index = smooth_index + 1;                    
+
+  // if we're at the end of the array...
+  if (smooth_index >= smooth_numReadings)              
+    // ...wrap around to the beginning: 
+    smooth_index = 0;                           
+
+  // calculate the average:
+  return smooth_total / smooth_numReadings;
+}
 
 // draw loop executes continuously
 void draw() {
@@ -201,9 +227,9 @@ void draw() {
       "Did you set your COM port in the code near line 20?", width/3, height/2);
   }
   
-  if (XBEE == true) {
-    text(leftDiff,10,50);
-    text(rightDiff,width-100,50);
+  if (DEBUG == true) {
+    text(leftVal,10,50);
+    text(rightVal,width-100,50);
   }
   
 } // end of draw loop
@@ -352,11 +378,13 @@ class SimpleThread extends Thread {
     //println ("Address: >" + data.address + "<  >" + leftAddress + "<");
     if (data.address.equals(leftAddress) == true) {
       
-      leftDiff = abs(data.value - leftVal);
-      leftVal = data.value; 
+      //leftDiff = abs(data.value - leftVal);
+      leftVal = data.value;
+      //leftVal = smooth_left(data.value);
+ 
     } else {
 
-      rightDiff = abs(data.value - rightVal);
+      //rightDiff = abs(data.value - rightVal);
       rightVal = data.value;
     }
     //println ("Address: " + data.address + " : " + data.value);
@@ -454,7 +482,7 @@ void player1() {
   fill(255);
   rect(x1,y1,15,90);
    
-  y1 = getLeftVal(1,height-90);
+  y1 = getLeftVal(1,height-45);
   
   /* 
   if (y1 <= 0) {
@@ -476,11 +504,11 @@ void player1() {
  
  
 void player2() {
-  rectMode(CORNER);
+  rectMode(CENTER);
   fill(255);
   rect(x2,y2,15,90);
    
-  y2 = getRightVal(1,height-90);
+  y2 = getRightVal(1,height-45);
    
    /*
   if (y2 <= 0) {
