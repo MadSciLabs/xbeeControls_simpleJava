@@ -5,8 +5,6 @@ import java.awt.Frame;
   Removed all display logic and just grab sensor data
 */
 
-boolean XBEE = true;
-
 //SMOOTHING VALUES
 int smooth_numReadings = 3;
 int[] smooth_readings = new int[smooth_numReadings];      // the readings from the analog input
@@ -14,8 +12,10 @@ int smooth_index = 0;                          // the index of the current readi
 int smooth_total = 0;                        // the running total
 int smooth_average = 0;
 
-boolean XBEE = false;
-int whichMachine = 0;
+boolean XBEE = true;
+int whichMachine = 1;
+String machineRoot = "";
+
 // 0 is Rui
 // 1 is Adam
 // 2 is Mini
@@ -128,15 +128,18 @@ void setup() {
 
   switch(whichMachine){
   case 0:      // Rui
-    font  = loadFont("/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/data/CasaleTwo-Alternates-NBP-100.vlw");
+    machineRoot  = "/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/";
   break;
   case 1:      // Adam
-    font  = loadFont("/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/data/CasaleTwo-Alternates-NBP-100.vlw");
+    machineRoot  = "/Users/adam lassy/Documents/Processing/xbeeControls_simpleJava/";
   break;
   case 2:      // Mini
-    font  = loadFont("/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/data/CasaleTwo-Alternates-NBP-100.vlw");
+    machineRoot  = "/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/";
   break;
   }
+  
+  font = loadFont(machineRoot + "data/CasaleTwo-Alternates-NBP-100.vlw");
+  
   size(1280*2, 720);
   minX = 0;
   maxX = width;
@@ -155,7 +158,7 @@ void setup() {
   // The log4j.properties file is required by the xbee api library, and 
   // needs to be in your data folder. You can find this file in the xbee
   // api library you downloaded earlier
-  PropertyConfigurator.configure(dataPath("")+"/log4j.properties"); 
+  PropertyConfigurator.configure(machineRoot + "data/log4j.properties"); 
   // Print a list in case the selected one doesn't work out
   println("Available serial ports:");
   println(Serial.list());
