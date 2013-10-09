@@ -1,7 +1,3 @@
-/*
- * Draws a set of thermometers for incoming XBee Sensor data
- * by Rob Faludi http://faludi.com
- */
 
 /*
   Modified Madsci:
@@ -34,6 +30,12 @@ float ballSpeedX = 4.5;
 float ballSpeedY = 4.5;
 boolean ballTouchingP1 = false;
 boolean ballTouchingP2 = false;
+
+
+int minX,maxX,minY,maxY;
+
+
+
  
 boolean wPressed = false;
 boolean sPressed = false;
@@ -71,7 +73,7 @@ String version = "1.1";
 
 // *** REPLACE WITH THE SERIAL PORT (COM PORT) FOR YOUR LOCAL XBEE ***
 
-String mySerialPort = Serial.list()[4];
+String mySerialPort = "";//Serial.list()[4];
   
 // create and initialize a new xbee object
 XBee xbee = new XBee();
@@ -86,7 +88,21 @@ PFont font;
 SimpleThread testThread;
 
 void setup() {
-  size(900,600); // screen size
+  background(0);
+  size(1280*2, 720);
+  minX = 0;
+  maxX = width;
+  minY = 0;
+  maxY = height;
+  
+  ballX = width*.5; //playing ball
+  ballY = height*.5;
+  x1 = 45; //player 1 coordinates (left)
+  y1 = (height-90)*.5;
+  x2 = width-45; //player 2 coordinates (right)
+  y2 = (height-90)*.5;
+  speed = 9;
+
 
   // The log4j.properties file is required by the xbee api library, and 
   // needs to be in your data folder. You can find this file in the xbee
@@ -98,7 +114,7 @@ void setup() {
   
   //Create Thread
   testThread = new SimpleThread(0,"controlThread");
-  testThread.start();
+  //testThread.start();
   
   //smooth();
   
@@ -312,22 +328,25 @@ PONG FUNCTIONS
 
 void demoBall() {
   noStroke();
-  fill(random(0,255),random(0,255),random(0,255));
-  ellipse(dbx,dby,40,40);
+  fill(255,0,0);
+  rectMode(CENTER);
+  rect(dbx,dby,40,40);
+    fill(random(0,255),random(0,255),random(0,255));
+//  rect(dbx,dby,40,40);
    
   dbx = dbx + dbSpeedX;
   dby = dby + dbSpeedY;
    
-  if (dbx >= 900) {
+  if (dbx >= maxX) {
     dbSpeedX = dbSpeedX * -1;
   }
-  if (dbx <= 0) {
+  if (dbx <= minX) {
     dbSpeedX = dbSpeedX * -1;
   }
-  if (dby >= 600) {
+  if (dby >= maxY) {
     dbSpeedY = dbSpeedY * -1;
   }
-  if (dby <= 0) {
+  if (dby <= minY) {
     dbSpeedY = dbSpeedY * -1;
   }
 }
@@ -340,11 +359,11 @@ void twoPlayer() {
   ball();
    
   PFont font;
-  font  = loadFont("Futura-CondensedMedium-100.vlw");
+  font  = loadFont("CasaleTwo-Alternates-NBP-100.vlw");
   textFont (font);
   textAlign(CENTER);
   text(""+p1Score,225,80);
-  text(""+p2Score,675,80);
+  text(""+p2Score,width-225,80);
    
   if (mPressed == true) {
     seizureMode = true;
@@ -363,7 +382,7 @@ void twoPlayer() {
 void midLine() {
   for (int i = 0; i < 1000; i = i+20) {
     fill(255);
-    rect(449,i,2,10);
+    rect(width*.5,i,2,10);
   }
 }
  
@@ -372,10 +391,11 @@ void midLine() {
  
 //
 void player1() {
+  rectMode(CENTER);
   fill(255);
-  rect(x1,y1,10,90);
+  rect(x1,y1,15,90);
    
-  y1 = getLeftVal(1,510);
+  y1 = getLeftVal(1,height-90);
   
   /* 
   if (y1 <= 0) {
@@ -397,10 +417,11 @@ void player1() {
  
  
 void player2() {
+  rectMode(CORNER);
   fill(255);
-  rect(x2,y2,10,90);
+  rect(x2,y2,15,90);
    
-  y2 = getRightVal(1,510);
+  y2 = getRightVal(1,height-90);
    
    /*
   if (y2 <= 0) {
@@ -421,26 +442,30 @@ void player2() {
 }
  
 void ball() {
+  noStroke();
   ellipseMode(CENTER);
-  fill(255);
+  fill(255,0 ,0);
   ellipse(ballX, ballY, 15, 15);
+  rectMode(CENTER);
+  fill(255);
+  rect(ballX, ballY, 15, 15); 
    
   if (goPressed == true) {
     ballX = ballX + ballSpeedX;
     ballY = ballY + ballSpeedY;
   }
    
-  if (ballY >= 600) {
+  if (ballY >= maxY) {
     ballSpeedY = ballSpeedY * -1;
   }
-  if (ballY <= 0) {
+  if (ballY <= minY) {
     ballSpeedY = ballSpeedY * -1;
   }
    
-  if ((ballX <= 60) && (ballX >= 45) && (ballY >= y1) && (ballY <= y1+90)) {
+  if ((ballX <= minX+60) && (ballX >= minX+45) && (ballY >= y1) && (ballY <= y1+90)) {
     ballTouchingP1 = true;
   }
-  if ((ballX >= 840) && (ballX <= 855) && (ballY >= y2) && (ballY <= y2+90)) {
+  if ((ballX >= maxX -60) && (ballX <= maxX-45) && (ballY >= y2) && (ballY <= y2+90)) {
     ballTouchingP2 = true;
   }
    
@@ -453,13 +478,13 @@ void ball() {
     ballTouchingP2 = false;
   }
    
-  if (ballX >= 900) {
-    ballX = 450;
+  if (ballX >= maxX) {
+    ballX = width*.5;;
     ballSpeedX = ballSpeedX * -1;
     p1Score = p1Score + 1;
   }
-  if (ballX <= 0) {
-    ballX = 450;
+  if (ballX <= minX) {
+    ballX = width*.5;
     ballSpeedX = ballSpeedX * -1;
     p2Score = p2Score + 1;
   }
