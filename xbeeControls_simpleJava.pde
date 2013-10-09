@@ -12,11 +12,11 @@ int smooth_index = 0;                          // the index of the current readi
 int smooth_total = 0;                        // the running total
 int smooth_average = 0;
 
-boolean DEBUG = true;
-boolean XBEE = true;
-int whichMachine = 1;
-int USB_PORT = 4;
-static int TOTAL_WIDTH = 1280;
+boolean DEBUG = false;
+boolean XBEE = false;
+int whichMachine = 2;
+int USB_PORT = 0;
+static int TOTAL_WIDTH = 2*1280;
 
 String machineRoot = "";
 
@@ -141,7 +141,7 @@ void setup() {
     machineRoot  = "/Users/adam lassy/Documents/Processing/xbeeControls_simpleJava/";
   break;
   case 2:      // Mini
-    machineRoot  = "/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/";
+    machineRoot  = "/Users/madscience/Documents/Processing/xbeeControls_simpleJava/";
   break;
   }
   
