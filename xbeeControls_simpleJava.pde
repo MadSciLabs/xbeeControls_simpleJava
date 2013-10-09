@@ -1,4 +1,4 @@
-
+import java.awt.Frame;
 /*
   Modified Madsci:
   
@@ -92,6 +92,20 @@ PFont font;
 
 SimpleThread testThread;
 
+
+ 
+static public void main(String args[]) {
+  Frame frame = new Frame("testing");
+  frame.setUndecorated(true);
+  // The name "sketch_name" must match the name of your program
+  PApplet applet = new xbeeControls_simpleJava();
+  frame.add(applet);
+  applet.init();
+  frame.setBounds(0, 0, 1280*2, 720); 
+  frame.setVisible(true);
+}
+
+
 void setup() {
   background(0);
   
@@ -99,7 +113,7 @@ void setup() {
     mySerialPort = Serial.list()[4];
   }
 
-  size(1280*1, 720);
+  size(1280*2, 720);
   minX = 0;
   maxX = width;
   minY = 0;
@@ -131,7 +145,10 @@ void setup() {
   
   //smooth();
   
-  frameRate(100);
+  frameRate(60);
+
+  font  = loadFont("/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/data/CasaleTwo-Alternates-NBP-100.vlw");
+
 }
 
 
@@ -376,8 +393,6 @@ void twoPlayer() {
   player2();
   ball();
    
-  PFont font;
-  font  = loadFont("CasaleTwo-Alternates-NBP-100.vlw");
   textFont (font);
   textAlign(CENTER);
   text(""+p1Score,225,80);
