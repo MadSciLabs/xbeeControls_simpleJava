@@ -5,6 +5,8 @@
   Removed all display logic and just grab sensor data
 */
 
+boolean XBEE = true;
+
 /******************
  PONG VARIABLES
 ******************/
@@ -73,8 +75,8 @@ String version = "1.1";
 
 // *** REPLACE WITH THE SERIAL PORT (COM PORT) FOR YOUR LOCAL XBEE ***
 
-String mySerialPort = "";//Serial.list()[4];
-  
+String mySerialPort;
+
 // create and initialize a new xbee object
 XBee xbee = new XBee();
 
@@ -89,7 +91,12 @@ SimpleThread testThread;
 
 void setup() {
   background(0);
-  size(1280*2, 720);
+  
+  if (XBEE == true) {
+    mySerialPort = Serial.list()[4];
+  }
+
+  size(1280*1, 720);
   minX = 0;
   maxX = width;
   minY = 0;
@@ -113,8 +120,11 @@ void setup() {
   println(Serial.list());
   
   //Create Thread
-  testThread = new SimpleThread(0,"controlThread");
-  //testThread.start();
+  testThread = new SimpleThread(10,"controlThread");
+  
+  if (XBEE) {
+    testThread.start();
+  }
   
   //smooth();
   
