@@ -6,6 +6,10 @@ import java.awt.Frame;
 */
 
 boolean XBEE = false;
+int whichMachine = 0;
+// 0 is Rui
+// 1 is Adam
+// 2 is Mini
 
 /******************
  PONG VARIABLES
@@ -113,6 +117,17 @@ void setup() {
     mySerialPort = Serial.list()[4];
   }
 
+  switch(whichMachine){
+  case 0:      // Rui
+    font  = loadFont("/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/data/CasaleTwo-Alternates-NBP-100.vlw");
+  break;
+  case 1:      // Adam
+    font  = loadFont("/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/data/CasaleTwo-Alternates-NBP-100.vlw");
+  break;
+  case 2:      // Mini
+    font  = loadFont("/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/data/CasaleTwo-Alternates-NBP-100.vlw");
+  break;
+  }
   size(1280*2, 720);
   minX = 0;
   maxX = width;
@@ -147,7 +162,6 @@ void setup() {
   
   frameRate(60);
 
-  font  = loadFont("/Users/rui pereira/Documents/Processing/xbeeControls_simpleJava/data/CasaleTwo-Alternates-NBP-100.vlw");
 
 }
 
