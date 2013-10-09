@@ -5,7 +5,14 @@ import java.awt.Frame;
   Removed all display logic and just grab sensor data
 */
 
-boolean XBEE = false;
+boolean XBEE = true;
+
+//SMOOTHING VALUES
+int smooth_numReadings = 3;
+int[] smooth_readings = new int[smooth_numReadings];      // the readings from the analog input
+int smooth_index = 0;                          // the index of the current reading
+int smooth_total = 0;                        // the running total
+int smooth_average = 0;
 
 /******************
  PONG VARIABLES
