@@ -100,9 +100,9 @@ void setup() {
   testThread = new SimpleThread(0,"controlThread");
   testThread.start();
   
-  smooth();
+  //smooth();
   
-  frameRate(50);
+  frameRate(100);
 }
 
 
@@ -112,10 +112,9 @@ void draw() {
      GET LEFT AND RIGHT VALS, PASSING IN THE DESIRED RANGE
   */
   int _leftVal = getLeftVal(1,100);  
-  text(_leftVal,10,50);
   
   int _rightVal = getRightVal(1,100);
-  text(_rightVal,width-100,50);
+  
 
   //PONG LOOP
   twoPlayer();
@@ -129,6 +128,10 @@ void draw() {
       "Is your XBee plugged in to your computer?\n" +
       "Did you set your COM port in the code near line 20?", width/3, height/2);
   }
+  
+  text(_leftVal,10,50);
+  
+  text(_rightVal,width-100,50);
   
 } // end of draw loop
 
@@ -235,7 +238,7 @@ class SimpleThread extends Thread {
     
       try {
     // opens your serial port defined above, at 9600 baud
-    xbee.open(mySerialPort, 9600);
+    xbee.open(mySerialPort, 19200);
   }
   catch (XBeeException e) {
     println("** Error opening XBee port: " + e + " **");
