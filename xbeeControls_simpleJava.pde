@@ -5,7 +5,7 @@
   Removed all display logic and just grab sensor data
 */
 
-boolean XBEE = true;
+boolean XBEE = false;
 
 /******************
  PONG VARIABLES
@@ -70,6 +70,9 @@ String rightAddress = "";
 
 int leftVal = 0;
 int rightVal = 0;
+
+int leftDiff = 0;
+int rightDiff = 0;
 
 String version = "1.1";
 
@@ -137,9 +140,9 @@ void draw() {
   /*
      GET LEFT AND RIGHT VALS, PASSING IN THE DESIRED RANGE
   */
-  int _leftVal = getLeftVal(1,100);  
+  //int _leftVal = getLeftVal(1,100);  
   
-  int _rightVal = getRightVal(1,100);
+  //int _rightVal = getRightVal(1,100);
   
 
   //PONG LOOP
@@ -155,9 +158,10 @@ void draw() {
       "Did you set your COM port in the code near line 20?", width/3, height/2);
   }
   
-  text(_leftVal,10,50);
-  
-  text(_rightVal,width-100,50);
+  if (XBEE == true) {
+    text(leftDiff,10,50);
+    text(rightDiff,width-100,50);
+  }
   
 } // end of draw loop
 
@@ -304,8 +308,12 @@ class SimpleThread extends Thread {
     
     //println ("Address: >" + data.address + "<  >" + leftAddress + "<");
     if (data.address.equals(leftAddress) == true) {
+      
+      leftDiff = abs(data.value - leftVal);
       leftVal = data.value; 
     } else {
+
+      rightDiff = abs(data.value - rightVal);
       rightVal = data.value;
     }
     //println ("Address: " + data.address + " : " + data.value);
